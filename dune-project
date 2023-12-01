@@ -5,22 +5,20 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github erickalkman/aoc2023))
 
-(authors "Author Name")
+(authors "Eric Kalkman")
 
-(maintainers "Maintainer Name")
+(maintainers "Eric Kalkman")
 
-(license LICENSE)
+;(license LICENSE)
 
-(documentation https://url/to/documentation)
+;(documentation https://url/to/documentation)
 
 (package
  (name aoc2023)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml dune)
- (tags
-  (topics "to describe" your project)))
+ (synopsis "Advent of Code 2023")
+ (description "Advent of Code 2023")
+ (depends ocaml dune))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project

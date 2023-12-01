@@ -1,4 +1,11 @@
 (executable
  (public_name aoc2023)
  (name main)
+ (modules main)
  (libraries aoc2023))
+
+(executable
+  (public_name day01)
+  (name day01)
+  (modules day01)
+  (libraries aoc2023))
