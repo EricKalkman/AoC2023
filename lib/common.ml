@@ -1,6 +1,5 @@
 
-let read_input_file fname =
-    let fname = "inputs/" ^ fname in
+let read_other_file fname =
     let lines = ref [] in
     let chan = open_in fname in
     try
@@ -11,6 +10,10 @@ let read_input_file fname =
     with End_of_file ->
         close_in chan;
         List.rev !lines
+
+let read_input_file fname =
+    let fname = "inputs/" ^ fname in
+    read_other_file fname
 
 let char_to_str c = String.make 1 c
 

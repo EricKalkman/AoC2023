@@ -10,6 +10,7 @@ bug-reports: "https://github.com/erickalkman/aoc2023/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.12"}
+  "alcotest" {with-test}
   "odoc" {with-doc}
 ]
 build: [

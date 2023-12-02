@@ -20,6 +20,6 @@
  (name aoc2023)
  (synopsis "Advent of Code 2023")
  (description "Advent of Code 2023")
- (depends ocaml dune))
+ (depends ocaml dune (alcotest :with-test)))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
