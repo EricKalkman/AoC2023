@@ -14,5 +14,12 @@ let read_input_file fname =
 
 let char_to_str c = String.make 1 c
 
-let first_of_pair (a,_) = a
-let snd_of_pair (_,b) = b
+let rec any p lst =
+    match lst with
+    | [] -> false
+    | x :: xs -> if p x then true else any p xs
+
+let rec all p lst =
+    match lst with
+    | [] -> true
+    | x :: xs -> if p x then all p xs else false

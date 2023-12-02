@@ -1,5 +1,4 @@
 open Parsing
-open Common
 
 let get_digits (str : string) =
     String.to_seq str
@@ -43,8 +42,8 @@ let get_first_result reslist tlist =
         | _ -> failwith "There should be no other parsed values"
 
 let digify_string str =
-    let parser = expect_option (List.map first_of_pair num_words) >=>? expect_digit >=>? skip any1 |> at_least_one in
-    let rev_parser = expect_option (List.map first_of_pair num_words_rev) >=>? expect_digit >=>? skip any1 |> at_least_one in
+    let parser = expect_option (List.map fst num_words) >=>? expect_digit >=>? skip any1 |> at_least_one in
+    let rev_parser = expect_option (List.map fst num_words_rev) >=>? expect_digit >=>? skip any1 |> at_least_one in
     let parsed = run_string_parser parser str in
     let rev_parsed = run_string_parser rev_parser (reverse_string str) in
     get_first_result parsed num_words ^ get_first_result rev_parsed num_words_rev

@@ -151,6 +151,15 @@ let stringify_group g =
         |> String.of_seq
     | _ -> failwith "unimplemented"
 
+let unwrap_group g =
+    match g with
+    | Group lst -> lst
+    | _ -> failwith "Attempted to unwrap a group"
+let group_to_pair g =
+    match unwrap_group g with
+    | [] | _::[] -> failwith "Failed to make a pair out of a group"
+    | a::b::_ -> a, b
+
 let expect_string str =
     String.to_seq str
     |> Seq.map expect_char
@@ -160,6 +169,8 @@ let expect_string str =
                          sq |> Seq.take (String.length str) |> String.of_seq))
     |> group
     >=> mod_top (fun g -> PString (stringify_group g))
+
+let skip_string str = expect_string str |> skip
 
 let expect_option strlist =
     List.to_seq strlist |> Seq.map expect_string |> Seq.fold_left (>=>?) fail
@@ -175,6 +186,14 @@ let expect_int =
         | WrongCharSet (_, fnd) -> NotInt(fnd)
         | e -> e)
     >=> mod_top (fun g -> Int (g |> stringify_group |> int_of_string))
+
+(* does not automatically group items! *)
+let expect_list data_p delim_p =
+    (data_p >=> skip delim_p |> some)
+    >=> maybe data_p
+
+let skip_whitespace =
+    expect_set "\n\r\t " |> skip
 
 let stringify_top stack sq =
     match stack with
@@ -197,12 +216,23 @@ let run_string_parser p text =
     | Success (stack, sq) -> Success (List.rev stack, sq)
     | e -> e
 
+let unwrap_result res =
+    match res with
+    | Failure _ -> failwith "Attempted to unwrap a failed parse result"
+    | Success (lst, _) -> lst
+
+let unwrap_int r =
+    match r with
+    | Int n -> n
+    | _ -> failwith "Tried to unwrap an int"
+
+let unwrap_group g =
+    match g with
+    | Group lst -> lst
+    | _ -> failwith "Attempted to unwrap a group"
+
 let unwrap_ps ps =
     match ps with
     | PString s -> s
     | _ -> failwith "encountered parse result that was not a pstring"
 
-let unwrap_result res =
-    match res with
-    | Failure _ -> failwith "Attempted to unwrap a failed parse result"
-    | Success (lst, _) -> lst
