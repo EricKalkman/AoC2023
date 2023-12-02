@@ -1,3 +1,4 @@
+open Common
 
 (* Expected * found *)
 type parse_error =
@@ -10,6 +11,19 @@ type parse_error =
     | FailedPred of char
     | EmptyStack
     | IntentionalFail
+
+let err_str err =
+    match err with
+    | EndOfString -> "EndOfString"
+    | WrongChar (ex, fnd) -> Printf.sprintf "Expected char %s; found %s" (char_to_str ex) (char_to_str fnd)
+    | WrongString (ex, fnd) -> Printf.sprintf "Expected string %s; found %s" ex fnd
+    | WrongCharSet (set, fnd) -> Printf.sprintf "Expected char in %s; found %s" set (char_to_str fnd)
+    | WrongStringSet (set, fnd) -> Printf.sprintf "Expected string in %s; found %s"
+                                        (String.concat ", " set) fnd
+    | NotInt c -> Printf.sprintf "Expected an int, got %s" (char_to_str c)
+    | FailedPred c -> Printf.sprintf "Predicate match failed on char %s" (char_to_str c)
+    | EmptyStack -> "EmptyStack"
+    | IntentionalFail -> "IntentionalFail"
 
 type parsed_item =
     | Sentinel
@@ -173,21 +187,15 @@ let stringify_top stack sq =
         | Group lst -> PString (stringify_group (Group lst))) xs,
         sq)
 
-type parsed_result =
-    | ParseFailure of parse_error
-    | ParseSuccess of parsed_item list
-
 let run_parser p sq =
     match p [] sq with
-    | Failure e -> ParseFailure e
-    | Success (stack, _) -> ParseSuccess (List.rev stack)
+    | Success (stack, sq) -> Success (List.rev stack, sq)
+    | e -> e
 
 let run_string_parser p text =
     match return text >>= p with
-    | Failure e -> ParseFailure e
-    | Success (stack, sq) -> 
-            assert (Seq.length sq == 0);
-            ParseSuccess (List.rev stack)
+    | Success (stack, sq) -> Success (List.rev stack, sq)
+    | e -> e
 
 let unwrap_ps ps =
     match ps with
@@ -196,5 +204,5 @@ let unwrap_ps ps =
 
 let unwrap_result res =
     match res with
-    | ParseFailure _ -> failwith "Attempted to unwrap a failed parse result"
-    | ParseSuccess lst -> lst
+    | Failure _ -> failwith "Attempted to unwrap a failed parse result"
+    | Success (lst, _) -> lst

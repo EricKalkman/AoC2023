@@ -11,3 +11,8 @@ let read_input_file fname =
     with End_of_file ->
         close_in chan;
         List.rev !lines
+
+let char_to_str c = String.make 1 c
+
+let first_of_pair (a,_) = a
+let snd_of_pair (_,b) = b
