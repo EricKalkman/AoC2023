@@ -193,7 +193,7 @@ let expect_list data_p delim_p =
     >=> maybe data_p
 
 let skip_whitespace =
-    expect_set "\n\r\t " |> skip
+    expect_set "\n\r\t " |> some |> skip
 
 let stringify_top stack sq =
     match stack with
