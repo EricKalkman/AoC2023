@@ -39,7 +39,11 @@ let parse_input lines =
 module ColorMap = Map.Make(String)
 
 let is_game_possible n_balls g =
-    all (fun round -> all (fun bc -> ColorMap.find bc.color n_balls >= bc.count) round) g.rounds
+    all (fun round ->
+        all (fun bc ->
+                ColorMap.find bc.color n_balls >= bc.count)
+            round)
+        g.rounds
 
 let part_1_maxes = [("red",12);("green",13);("blue",14)] |> List.to_seq |> ColorMap.of_seq;;
 
@@ -51,15 +55,16 @@ let part_1 lines =
     |> Seq.fold_left (+) 0
 
 let min_cubes game =
+    let fold_pull counts bc =
+        counts
+        |> ColorMap.update bc.color (fun count ->
+                match count with
+                | None -> Some bc.count
+                | Some c -> Some (Int.max c bc.count))
+    in
     let start_counts = [("red", 0); ("green", 0); ("blue", 0)] |> List.to_seq |> ColorMap.of_seq in
     List.fold_left (fun counts round ->
-        List.fold_left (fun counts bc ->
-            counts |> ColorMap.update bc.color (fun count ->
-                match count with
-                | None -> None
-                | Some c -> Some (Int.max c bc.count)))
-            counts
-            round)
+        List.fold_left fold_pull counts round)
         start_counts
         game.rounds
 

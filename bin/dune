@@ -5,13 +5,13 @@
  (libraries aoc2023))
 
 (executable
-  (public_name day01)
-  (name day01)
-  (modules day01)
-  (libraries aoc2023))
+ (public_name day01)
+ (name day01)
+ (modules day01)
+ (libraries aoc2023))
 
 (executable
-  (public_name day02)
-  (name day02)
-  (modules day02)
-  (libraries aoc2023))
+ (public_name day02)
+ (name day02)
+ (modules day02)
+ (libraries aoc2023))
