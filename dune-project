@@ -1,6 +1,7 @@
 (lang dune 3.12)
 
 (name aoc2023)
+(version 1eea029-dirty)
 
 (generate_opam_files true)
 
