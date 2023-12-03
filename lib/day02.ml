@@ -42,8 +42,8 @@ let is_game_possible n_balls g =
     all (fun round ->
         all (fun bc ->
                 ColorMap.find bc.color n_balls >= bc.count)
-            round)
-        g.rounds
+            (List.to_seq round))
+        (List.to_seq g.rounds)
 
 let part_1_maxes = [("red",12);("green",13);("blue",14)] |> List.to_seq |> ColorMap.of_seq;;
 
