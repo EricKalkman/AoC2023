@@ -34,7 +34,7 @@ type engine_data = {
 
 let process_token_row row_idx row =
     row
-    (* normally would conver to Seq here, but Seq doesn't have fold_left_map *)
+    (* normally would convert to Seq here, but Seq doesn't have fold_left_map *)
     (* traverses the row, incrementing the col_idx as it goes *)
     (* data are marshalled into the engine_data structure *)
     |> List.fold_left_map (fun col_idx token ->
@@ -48,6 +48,7 @@ let process_token_row row_idx row =
                               { datum = Number n; row = row_idx; col = col_idx }
                 | _ -> failwith "Unrecognized token")
         0
+    (* drop the final value of the accumulator from fold_left_map *)
     |> snd
 
 let process_engine engine_lines =
@@ -63,7 +64,7 @@ let process_engine engine_lines =
     |> Seq.partition (fun x -> match x.datum with | Part _ -> true | _ -> false)
 
 let span_of_int num =
-    (* returns a sequence of coord's representing the coords that num covers *)
+    (* returns a sequence of coord * number pairs representing the coords that num covers *)
     match num.datum with
     | Number n -> make_range num.col (num.col + (String.length (string_of_int n) - 1))
                     |> Seq.map (fun col -> (num.row, col), n)
