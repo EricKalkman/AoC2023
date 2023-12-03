@@ -2,4 +2,3 @@
  (name test_aoc2023)
  (libraries alcotest aoc2023)
  (modules test_aoc2023))
-
