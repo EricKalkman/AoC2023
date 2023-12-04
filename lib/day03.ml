@@ -117,13 +117,11 @@ let num_border num =
   in
   CoordS.diff all_points num_span
 
-let associated_part partset num =
+let associated_parts partset num =
   (* determines the coord at which a part is near num *)
   num_border num
-  (* remove all border coords that don't correspond to a part by searching the part set *)
-  |> CoordS.to_seq
-  |> Seq.filter_map (fun c -> CoordS.find_opt c partset)
-  |> List.of_seq
+  (* determine the set of border coords that intersect with part coords *)
+  |> CoordS.inter partset
 
 let unwrap_num num =
   match num.datum with Number n -> n | _ -> failwith "unreachable"
@@ -133,17 +131,21 @@ let part_1 lines =
   let partset = create_point_cloud_of_parts parts in
   nums
   (* create pairs of (num, coord of associated part) *)
-  |> Seq.map (fun n -> (unwrap_num n, associated_part partset n))
+  |> Seq.map (fun n -> (unwrap_num n, associated_parts partset n))
   (* remove numbers with no associated parts *)
-  |> Seq.filter (fun (_, coord_lst) -> List.length coord_lst > 0)
+  |> Seq.filter (fun (_, coord_set) -> CoordS.cardinal coord_set > 0)
   (* take only the numbers *)
   |> Seq.map fst
   |> Seq.fold_left ( + ) 0
 
+module IntS = Set.Make(Int)
+
 let associated_numbers nummap part =
   neighbors (part.row, part.col)
+  (* get all numbers associated with the part *)
   |> Seq.filter_map (fun c -> CoordM.find_opt c nummap)
-  |> List.of_seq |> List.sort_uniq compare
+  (* deduplicate in case the number covers multiple neighbor tiles *)
+  |> IntS.of_seq
 
 let part_2 lines =
   let parts, nums = tokenize_engine lines |> process_engine in
@@ -157,7 +159,7 @@ let part_2 lines =
   in
   gears
   |> Seq.map (associated_numbers nummap) (* get gears' associated numbers *)
-  |> Seq.filter (fun nums -> List.length nums == 2)
+  |> Seq.filter (fun nums -> IntS.cardinal nums == 2)
      (* filter out *'s that don't have two numbers for ratio *)
-  |> Seq.map (fun nums -> List.fold_left ( * ) 1 nums)
+  |> Seq.map (fun nums -> IntS.to_seq nums |> Seq.fold_left ( * ) 1)
   |> Seq.fold_left (fun acc num -> acc + num) 0
