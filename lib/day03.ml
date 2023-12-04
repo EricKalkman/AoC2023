@@ -138,7 +138,7 @@ let part_1 lines =
   |> Seq.map fst
   |> Seq.fold_left ( + ) 0
 
-module IntS = Set.Make(Int)
+module IntS = Set.Make (Int)
 
 let associated_numbers nummap part =
   neighbors (part.row, part.col)

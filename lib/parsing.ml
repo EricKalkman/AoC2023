@@ -156,6 +156,7 @@ let expect_string str =
   |> group
   >=> mod_top (fun g -> PString (stringify_group g))
 
+let skip_char c = expect_char c |> skip
 let skip_string str = expect_string str |> skip
 
 let expect_option strlist =
@@ -180,7 +181,8 @@ let expect_int =
 let expect_list data_p delim_p =
   data_p >=> skip delim_p |> some >=> maybe data_p
 
-let skip_whitespace = expect_set "\n\r\t " |> some |> skip
+let expect_whitespace = expect_set "\n\r\t " |> at_least_one
+let skip_whitespace = expect_whitespace |> maybe |> skip
 
 let stringify_top stack sq =
   match stack with
