@@ -52,7 +52,7 @@ let part_2 lines =
          let wins = n_wins g in
          let n_copies = IntM.find g.id m in
          Seq.fold_left
-           (fun m gid -> IntM.update_no_check gid (fun c -> c + n_copies) m)
+           (fun m gid -> IntM.update_unsafe gid (fun c -> c + n_copies) m)
            m
            (make_range (g.id + 1) (g.id + wins)))
        init_map
