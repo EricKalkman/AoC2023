@@ -45,3 +45,15 @@ let make_range lo hi =
   aux Seq.empty hi
 
 let id x = x
+
+module CustomMap (M : Map.S) = struct
+  include M
+
+  let update_unsafe key fn mp =
+    M.update key
+      (fun x_opt ->
+        match x_opt with
+        | None -> failwith "update_unsafe"
+        | Some x -> Some (fn x))
+      mp
+end

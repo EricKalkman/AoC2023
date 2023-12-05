@@ -25,20 +25,6 @@ let process_input lines =
 
 module IntS = Set.Make (Int)
 
-let score_game g =
-  let score_nums =
-    IntS.inter
-      (List.to_seq g.winning_nos |> IntS.of_seq)
-      (List.to_seq g.player_nos |> IntS.of_seq)
-  in
-  if IntS.cardinal score_nums == 0 then 0
-  else
-    score_nums |> IntS.to_seq |> Seq.drop 1
-    |> Seq.fold_left (fun acc _ -> 2 * acc) 1
-
-let part_1 lines =
-  lines |> process_input |> Seq.map score_game |> Seq.fold_left ( + ) 0
-
 let n_wins g =
   let score_nums =
     IntS.inter
@@ -47,7 +33,15 @@ let n_wins g =
   in
   IntS.cardinal score_nums
 
-module IntM = Map.Make (Int)
+let score_game g =
+  let wins = n_wins g in
+  if wins == 0 then 0
+  else make_range 1 wins |> Seq.drop 1 |> Seq.fold_left (fun acc _ -> 2 * acc) 1
+
+let part_1 lines =
+  lines |> process_input |> Seq.map score_game |> Seq.fold_left ( + ) 0
+
+module IntM = CustomMap (Map.Make (Int))
 
 let part_2 lines =
   let games = process_input lines in
@@ -58,13 +52,7 @@ let part_2 lines =
          let wins = n_wins g in
          let n_copies = IntM.find g.id m in
          Seq.fold_left
-           (fun m gid ->
-             IntM.update gid
-               (fun cs_opt ->
-                 match cs_opt with
-                 | None -> failwith "unreachable game"
-                 | Some c -> Some (c + n_copies))
-               m)
+           (fun m gid -> IntM.update_no_check gid (fun c -> c + n_copies) m)
            m
            (make_range (g.id + 1) (g.id + wins)))
        init_map
