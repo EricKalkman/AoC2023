@@ -3,6 +3,7 @@ open Common
 (* Expected * found *)
 type parse_error =
   | EndOfString
+  | NotEndOfString
   | WrongChar of char * char
   | WrongString of string * string
   | WrongCharSet of string * char
@@ -15,6 +16,7 @@ type parse_error =
 let err_str err =
   match err with
   | EndOfString -> "EndOfString"
+  | NotEndOfString -> "NotEndOfString"
   | WrongChar (ex, fnd) ->
       Printf.sprintf "Expected char %s; found %s" (char_to_str ex)
         (char_to_str fnd)
@@ -80,7 +82,20 @@ let rec some p stack sq =
 let at_least_one p = p >=> some p
 let nop state sq = Success (state, sq)
 let fail _ _ = Failure IntentionalFail
+
+let expect_eof state sq =
+  if Seq.is_empty sq then Success (state, sq) else Failure NotEndOfString
+
 let maybe p = p >=>? nop
+
+let rec until cond_p p stack sq =
+  match cond_p stack sq with
+  | Success _ -> Success (stack, sq)
+  | Failure EndOfString -> Failure EndOfString
+  | _ -> (
+      match p stack sq with
+      | Success (ns, nq) -> until cond_p p ns nq
+      | err -> err)
 
 let any1 state sq =
   match Seq.uncons sq with
@@ -181,6 +196,11 @@ let expect_int =
 let expect_list data_p delim_p =
   data_p >=> skip delim_p |> some >=> maybe data_p
 
+let expect_nonempty_list data_p delim_p =
+  data_p >=> skip delim_p |> some >=> data_p
+
+let expect_nl = expect_char '\n'
+let skip_nl = skip expect_nl
 let expect_whitespace = expect_set "\n\r\t " |> at_least_one
 let skip_whitespace = expect_whitespace |> maybe |> skip
 
@@ -198,6 +218,11 @@ let stringify_top stack sq =
             | Group lst -> PString (stringify_group (Group lst)))
             xs,
           sq )
+
+let string_until_char c = until (expect_char c) any1 |> group >=> stringify_top
+
+let string_until_str str =
+  until (expect_string str) any1 |> group >=> stringify_top
 
 let run_parser p sq =
   match p [] sq with

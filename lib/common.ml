@@ -14,6 +14,7 @@ let read_input_file fname =
   let fname = "inputs/" ^ fname in
   read_other_file fname
 
+let read_intact_input_file fname = read_input_file fname |> String.concat "\n"
 let char_to_str c = String.make 1 c
 
 (*let rec any p lst =
@@ -57,3 +58,7 @@ module CustomMap (M : Map.S) = struct
         | Some x -> Some (fn x))
       mp
 end
+
+let rec groups_of_n n sq =
+  if Seq.is_empty sq then Seq.empty
+  else Seq.cons (Seq.take n sq) @@ groups_of_n n (Seq.drop n sq)
