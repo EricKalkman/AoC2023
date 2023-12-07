@@ -249,3 +249,8 @@ let unwrap_ps ps =
   match ps with
   | PString s -> s
   | _ -> failwith "encountered parse result that was not a pstring"
+
+let unwrap_char cs =
+  match cs with
+  | Char c -> c
+  | _ -> failwith "encountered a parse result that was not a char"
