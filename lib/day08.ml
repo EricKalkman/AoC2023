@@ -48,10 +48,10 @@ let traverse m start stopcond fin_dirseq =
     let cur = List.hd path in
     if stopcond cur then path
     else
-      let next_dir = Seq.uncons dirseq |> Option.get |> fst in
-      traverse_aux
-        (List.cons (NM.find cur m |> next_dir) path)
-        (Seq.drop 1 dirseq)
+      match Seq.uncons dirseq with
+      | Some (next_dir, restseq) ->
+          traverse_aux (List.cons (NM.find cur m |> next_dir) path) restseq
+      | None -> failwith "unreachable"
   in
   traverse_aux [ start ] (fin_dirseq |> Seq.repeat |> Seq.concat)
 
@@ -67,17 +67,13 @@ let lcm a b = a * b / gcd a b
 let part_2 inp =
   let dirseq, m = process_input inp in
   (* find nodes that end with A *)
-  let srcs =
-    NM.to_seq m
-    |> Seq.filter (fun (src, _) -> String.ends_with ~suffix:"A" src)
-    |> Seq.map fst |> List.of_seq
-  in
-  (* Traverse from each starting node until one ending in Z is encountered *)
-  (* too lazy to implement a faster graph type or memoize, so... *)
-  Parmap.parmap
-    (fun src ->
-      traverse m src (String.ends_with ~suffix:"Z") dirseq
-      |> List.length |> pred)
-    (Parmap.L srcs)
+  NM.to_seq m
+  |> Seq.filter (fun (src, _) -> String.ends_with ~suffix:"A" src)
+  |> Seq.map fst
+  |> Seq.map
+       (* Traverse from each starting node until one ending in Z is encountered *)
+       (fun src ->
+         traverse m src (String.ends_with ~suffix:"Z") dirseq
+         |> List.length |> pred)
   (* calculate the period *)
-  |> List.fold_left lcm 1
+  |> Seq.fold_left lcm 1
