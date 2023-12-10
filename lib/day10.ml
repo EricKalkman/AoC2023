@@ -172,16 +172,13 @@ let part_2 inp =
           in
           (res, CM.add (row, col) res mem)
   in
-  let coords =
-    (* generate all row, col points on the map *)
-    generate_grid_points 0 (Array.length map.(0) - 2) 0 (Array.length map - 2)
-    (* remove all points on the path *)
-    |> Seq.filter (fun c -> not (CoordS.mem c path_set))
-  in
-  let crossings =
-    Seq.fold_left (fun mem c -> snd @@ calc_crossings c mem) CM.empty coords
-  in
-  coords
-  |> Seq.map (fun c -> (c, CM.find c crossings))
-  |> Seq.filter (fun (_, n) -> n mod 2 == 1)
-  |> Seq.length
+  (* generate all row, col points on the map *)
+  generate_grid_points 0 (Array.length map - 2) 0 (Array.length map.(0) - 2)
+  (* remove all points on the path *)
+  |> Seq.filter (fun c -> not (CoordS.mem c path_set))
+  |> Seq.fold_left
+       (fun (mem, cnt) c ->
+         let n_cross, mem = calc_crossings c mem in
+         (mem, if n_cross mod 2 == 1 then cnt + 1 else cnt))
+       (CM.empty, 0)
+  |> snd
