@@ -62,3 +62,24 @@ end
 let rec groups_of_n n sq =
   if Seq.is_empty sq then Seq.empty
   else Seq.cons (Seq.take n sq) @@ groups_of_n n (Seq.drop n sq)
+
+type coord = int * int
+
+let compare_coord (x1, y1) (x2, y2) =
+  match compare x1 x2 with 0 -> compare y1 y2 | r -> r
+
+let min_coord a b = if compare a b <= 0 then a else b
+
+let unfold gen start =
+  let rec unfold' cur () =
+    match gen cur with None -> Seq.Nil | Some x -> Seq.Cons (cur, unfold' x)
+  in
+  unfold' start
+
+let rec pairwise seq =
+  match Seq.uncons seq with
+  | None -> Seq.empty
+  | Some (x, xs) -> (
+      match Seq.uncons xs with
+      | None -> Seq.empty
+      | Some (y, _) -> fun () -> Seq.Cons ((x, y), pairwise xs))
