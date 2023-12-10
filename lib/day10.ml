@@ -174,12 +174,7 @@ let part_2 inp =
   in
   let coords =
     (* generate all row, col points on the map *)
-    Seq.flat_map
-      (fun row ->
-        Seq.map
-          (fun col -> (row, col))
-          (make_range 0 (Array.length map.(0) - 2)))
-      (make_range 0 (Array.length map - 2))
+    generate_grid_points 0 (Array.length map.(0) - 2) 0 (Array.length map - 2)
     (* remove all points on the path *)
     |> Seq.filter (fun c -> not (CoordS.mem c path_set))
   in

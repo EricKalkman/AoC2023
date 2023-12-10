@@ -83,3 +83,8 @@ let rec pairwise seq =
       match Seq.uncons xs with
       | None -> Seq.empty
       | Some (y, _) -> fun () -> Seq.Cons ((x, y), pairwise xs))
+
+let generate_grid_points x1 x2 y1 y2 =
+  Seq.flat_map
+    (fun x -> Seq.map (fun y -> (x, y)) (make_range y1 y2))
+    (make_range x1 x2)
