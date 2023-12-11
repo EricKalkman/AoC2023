@@ -1,35 +1,27 @@
 open Common
-open Parsing
 
-let test_inp = read_input_file "day11.test"
-let real_inp = read_input_file "day11.inp"
-let line_parser = expect_set ".#" |> at_least_one >=> skip_whitespace
-
-let process_input inp =
+let process_input lines =
   let map =
-    inp |> List.to_seq
-    |> Seq.map (fun line ->
-           run_string_parser line_parser line
-           |> unwrap_result |> List.to_seq |> Seq.map unwrap_char
-           |> Array.of_seq)
+    List.to_seq lines
+    |> Seq.map (fun s -> String.to_seq s |> Array.of_seq)
     |> Array.of_seq
   in
   let galaxies =
     Seq.filter (fun (row, col) -> map.(row).(col) == '#')
-    @@ generate_grid_points 0 (Array.length map - 1) 0 (Array.length map.(0) - 1)
+    @@ generate_grid_points 0 (last_row map) 0 (last_col map)
     |> List.of_seq
   in
   let void_rows =
     Seq.filter
       (fun row ->
-        all (fun col -> map.(row).(col) == '.') (make_range 0 (last_col map)))
+        make_range 0 @@ last_col map |> all (fun col -> map.(row).(col) == '.'))
       (make_range 0 @@ last_row map)
     |> List.of_seq
   in
   let void_cols =
     Seq.filter
       (fun col ->
-        all (fun row -> map.(row).(col) == '.') (make_range 0 @@ last_row map))
+        make_range 0 @@ last_row map |> all (fun row -> map.(row).(col) == '.'))
       (make_range 0 @@ last_col map)
     |> List.of_seq
   in
