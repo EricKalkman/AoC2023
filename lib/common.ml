@@ -88,3 +88,19 @@ let generate_grid_points x1 x2 y1 y2 =
   Seq.flat_map
     (fun x -> Seq.map (fun y -> (x, y)) (make_range y1 y2))
     (make_range x1 x2)
+
+let last_row g = Array.length g - 1
+let last_col g = Array.length g.(0) - 1
+let manh_dist (r1, c1) (r2, c2) = Int.abs (r1 - r2) + Int.abs (c1 - c2)
+
+let rec map_pairs fn sq =
+  match Seq.uncons sq with
+  | None -> Seq.empty
+  | Some (x, xs) -> Seq.append (Seq.map (fun y -> fn x y) xs) @@ map_pairs fn xs
+
+let rec map_pairs_list fn lst =
+  match lst with
+  | [] -> Seq.empty
+  | x :: xs ->
+      Seq.append (Seq.map (fun y -> fn x y) (List.to_seq xs))
+      @@ map_pairs_list fn xs
