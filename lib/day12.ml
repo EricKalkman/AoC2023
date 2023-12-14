@@ -45,7 +45,7 @@ let solve springs rngs =
       match Hashtbl.find_opt ht (springs, rngs) with
       | Some x -> x
       | None -> (
-        (* if no memoized result *)
+          (* if no memoized result *)
           match (springs, rngs) with
           | [], [] -> 1
           | [], _ -> 0
