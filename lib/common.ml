@@ -64,11 +64,22 @@ let rec groups_of_n n sq =
   else Seq.cons (Seq.take n sq) @@ groups_of_n n (Seq.drop n sq)
 
 type coord = int * int
+type direction = N | E | S | W
 
 let compare_coord (x1, y1) (x2, y2) =
   match compare x1 x2 with 0 -> compare y1 y2 | r -> r
 
 let min_coord a b = if compare a b <= 0 then a else b
+
+let coord_in_box rowlo rowhi collo colhi (row, col) =
+  in_range row rowlo rowhi && in_range col collo colhi
+
+let translate dir n (row, col) =
+  match dir with
+  | N -> (row - n, col)
+  | E -> (row, col + n)
+  | S -> (row + n, col)
+  | W -> (row, col - n)
 
 let unfold gen start =
   let rec unfold' cur () =
