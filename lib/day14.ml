@@ -47,6 +47,7 @@ let e_setter board row col c =
   board.(row).(Array.length board.(0) - col - 1) <- c
 
 let tilt_board dir board =
+  (* tilts the board in direction dir *)
   let getter =
     match dir with
     | N -> n_getter
