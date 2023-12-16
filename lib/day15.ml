@@ -19,8 +19,7 @@ let hash_cmd =
   String.to_seq >> Seq.fold_left (fun h c -> (h + int_of_char c) * 17 mod 256) 0
 
 let part_1 inp =
-  let cmds = parse_input inp in
-  cmds |> List.map hash_cmd |> List.fold_left ( + ) 0
+  inp |> parse_input |> List.map hash_cmd |> List.fold_left ( + ) 0
 
 let process_command boxes cmd =
   let remove_lens boxes label =
@@ -31,7 +30,9 @@ let process_command boxes cmd =
   let replace_lens boxes label focal_len =
     let h = hash_cmd label in
     boxes.(h) <-
-      update_or_emplace_back (fst >> String.equal label) (label, focal_len) boxes.(h);
+      update_or_emplace_back
+        (fst >> String.equal label)
+        (label, focal_len) boxes.(h);
     boxes
   in
   match cmd with
