@@ -40,9 +40,8 @@ let process_command boxes cmd =
   | Replace (label, len) -> replace_lens boxes label len
 
 let part_2 inp =
-  let boxes = Array.make 256 [] in
   parse_input inp |> List.map parse_cmd
-  |> List.fold_left process_command boxes
+  |> List.fold_left process_command (Array.make 256 [])
   |> Array.mapi (fun boxnum lenses ->
          List.to_seq lenses
          |> Seq.fold_lefti
