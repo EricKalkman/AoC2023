@@ -220,6 +220,7 @@ let stringify_top stack sq =
           sq )
 
 let string_until_char c = until (expect_char c) any1 |> group >=> stringify_top
+let string_until_set s = until (expect_set s) any1 |> group >=> stringify_top
 
 let string_until_str str =
   until (expect_string str) any1 |> group >=> stringify_top

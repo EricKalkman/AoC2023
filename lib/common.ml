@@ -22,6 +22,8 @@ let char_to_str c = String.make 1 c
     | [] -> false
     | x :: xs -> if p x then true else any p xs*)
 
+let ( >> ) f g x = g (f x)
+
 let rec any p sq =
   match Seq.uncons sq with
   | None -> false
@@ -115,3 +117,13 @@ let rec map_pairs_list fn lst =
   | x :: xs ->
       Seq.append (Seq.map (fun y -> fn x y) (List.to_seq xs))
       @@ map_pairs_list fn xs
+
+let rec remove_pred p lst =
+  match lst with
+  | [] -> lst
+  | y :: ys -> if p y then ys else y :: remove_pred p ys
+
+let rec update_or_emplace_back p x lst =
+  match lst with
+  | [] -> [ x ]
+  | y :: ys -> if p y then x :: ys else y :: update_or_emplace_back p x ys
