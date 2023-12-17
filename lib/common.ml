@@ -136,6 +136,12 @@ let rec map_pairs fn sq =
   | None -> Seq.empty
   | Some (x, xs) -> Seq.append (Seq.map (fun y -> fn x y) xs) @@ map_pairs fn xs
 
+let rec product seq1 seq2 =
+  match Seq.uncons seq1 with
+  | None -> Seq.empty
+  | Some (x, xs) ->
+      Seq.append (seq2 |> Seq.map (fun y -> (x, y))) (product xs seq2)
+
 let rec map_pairs_list fn lst =
   match lst with
   | [] -> Seq.empty

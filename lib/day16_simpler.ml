@@ -69,15 +69,18 @@ let part_1 inp =
 let generate_starting_nodes grid =
   let h = Array.length grid in
   let w = Array.length grid.(0) in
-  let left = ray_along S (0, 0) |> Seq.take h |> Seq.map (fun c -> E, c) in
-  let right = ray_along S (0, w-1) |> Seq.take h |> Seq.map (fun c -> W, c) in
-  let top = ray_along E (0, 0) |> Seq.take w |> Seq.map (fun c -> S, c) in
-  let bottom = ray_along E (h-1, 0) |> Seq.take w |> Seq.map (fun c -> N, c) in
+  let left = ray_along S (0, 0) |> Seq.take h |> Seq.map (fun c -> (E, c)) in
+  let right =
+    ray_along S (0, w - 1) |> Seq.take h |> Seq.map (fun c -> (W, c))
+  in
+  let top = ray_along E (0, 0) |> Seq.take w |> Seq.map (fun c -> (S, c)) in
+  let bottom =
+    ray_along E (h - 1, 0) |> Seq.take w |> Seq.map (fun c -> (N, c))
+  in
   [| left; right; top; bottom |] |> Array.to_seq |> Seq.concat
 
 let part_2 inp =
   let grid = process_input inp in
   generate_starting_nodes grid
   |> Seq.map (fun (h, c) -> traverse grid h c)
-  |> Seq.map CS.cardinal
-  |> Seq.fold_left Int.max 0
+  |> Seq.map CS.cardinal |> Seq.fold_left Int.max 0
