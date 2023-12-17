@@ -41,12 +41,14 @@ let rec all p sq =
 let compose f g x = f (g x)
 let in_range x a b = x >= a && x <= b
 
-let make_range lo hi =
-  let rec aux acc hi =
-    if hi < lo then acc else aux (Seq.cons hi acc) (hi - 1)
+let make_range_of_step start stop step =
+  let rec aux acc stop' =
+    if compare start stop' == -compare start stop then acc
+    else aux (Seq.cons stop' acc) (stop' - step)
   in
-  aux Seq.empty hi
+  aux Seq.empty stop
 
+let make_range lo hi = make_range_of_step lo hi 1
 let id x = x
 
 module CustomMap (M : Map.S) = struct
@@ -68,13 +70,22 @@ let rec groups_of_n n sq =
 type coord = int * int
 type direction = N | E | S | W
 
+let neg dir = match dir with N -> S | S -> N | E -> W | W -> E
+
 let compare_coord (x1, y1) (x2, y2) =
   match compare x1 x2 with 0 -> compare y1 y2 | r -> r
 
+let int_of_dir d = match d with N -> 0 | E -> 1 | S -> 2 | W -> 3
+let compare_dir d1 d2 = compare (int_of_dir d1) (int_of_dir d2)
 let min_coord a b = if compare a b <= 0 then a else b
 
 let coord_in_box rowlo rowhi collo colhi (row, col) =
   in_range row rowlo rowhi && in_range col collo colhi
+
+let in_grid grid =
+  let h = Array.length grid in
+  let w = Array.length grid.(0) in
+  coord_in_box 0 (h - 1) 0 (w - 1)
 
 let translate dir n (row, col) =
   match dir with
@@ -89,6 +100,9 @@ let unfold gen start =
   in
   unfold' start
 
+let ray_along dir = unfold (translate dir 1 >> Option.some)
+let grid_get grid (row, col) = grid.(row).(col)
+
 let rec pairwise seq =
   match Seq.uncons seq with
   | None -> Seq.empty
@@ -101,6 +115,11 @@ let generate_grid_points x1 x2 y1 y2 =
   Seq.flat_map
     (fun x -> Seq.map (fun y -> (x, y)) (make_range y1 y2))
     (make_range x1 x2)
+
+let generate_points_on_grid grid =
+  let h = Array.length grid in
+  let w = Array.length grid.(0) in
+  generate_grid_points 0 (h - 1) 0 (w - 1)
 
 let last_row g = Array.length g - 1
 let last_col g = Array.length g.(0) - 1
