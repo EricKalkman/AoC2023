@@ -105,3 +105,9 @@
  (name day16_simpler)
  (modules day16_simpler)
  (libraries aoc2023))
+
+(executable
+ (public_name day17)
+ (name day17)
+ (modules day17)
+ (libraries aoc2023))
