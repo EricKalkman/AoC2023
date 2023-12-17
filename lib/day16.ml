@@ -119,9 +119,7 @@ let parse_mir_and_edges grid c =
          match mir_of_coord grid c2 with
          (* if the ray goes off the map, don't count the step off the map *)
          | NoMir -> (n1, sink_node, manh_dist c c2 - 1)
-         | _ ->
-             let n2 = (c2, outdir, In) in
-             (n1, n2, manh_dist c c2))
+         | _ -> (n1, (c2, outdir, In), manh_dist c c2))
   |> Seq.append self_edges
 
 module G = Graphs.Make (struct
