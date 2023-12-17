@@ -112,15 +112,5 @@ module Make (NT : NodeType) = struct
   let neighbors (_, edges) n =
     match EM.find_opt n edges with None -> Seq.empty | Some s -> ES.to_seq s
 
-  let flood_find src (nodes, edges) =
-    let rec dfs n q =
-      Seq.fold_left
-        (fun q (neigh, _) -> if NS.mem neigh q then q else dfs neigh q)
-        q
-        (neighbors (nodes, edges) n)
-      |> NS.add n
-    in
-    dfs src NS.empty |> NS.to_seq
-
   let to_node_seq (nodes, _) = NM.to_seq nodes |> Seq.map fst
 end
