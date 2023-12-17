@@ -99,3 +99,9 @@
  (name day16)
  (modules day16)
  (libraries aoc2023))
+
+(executable
+ (public_name day16_simpler)
+ (name day16_simpler)
+ (modules day16_simpler)
+ (libraries aoc2023))

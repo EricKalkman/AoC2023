@@ -79,6 +79,10 @@ let int_of_dir d = match d with N -> 0 | E -> 1 | S -> 2 | W -> 3
 let compare_dir d1 d2 = compare (int_of_dir d1) (int_of_dir d2)
 let min_coord a b = if compare a b <= 0 then a else b
 
+let coord_neigh4 (row, col) =
+  [| (row, col + 1); (row, col - 1); (row + 1, col); (row - 1, col) |]
+  |> Array.to_seq
+
 let coord_in_box rowlo rowhi collo colhi (row, col) =
   in_range row rowlo rowhi && in_range col collo colhi
 
@@ -86,6 +90,8 @@ let in_grid grid =
   let h = Array.length grid in
   let w = Array.length grid.(0) in
   coord_in_box 0 (h - 1) 0 (w - 1)
+
+let grid_neigh4 grid = coord_neigh4 >> Seq.filter (in_grid grid)
 
 let translate dir n (row, col) =
   match dir with
