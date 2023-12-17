@@ -6,13 +6,6 @@ let process_input =
 (* used for splitters *)
 type axis = Horiz | Vert
 
-(* comparison for use in Maps and Sets *)
-let compare_axis a1 a2 =
-  match (a1, a2) with
-  | Horiz, Vert -> -1
-  | Vert, Horiz -> 1
-  | _ -> 0
-
 let is_parallel dir ax =
   match (dir, ax) with
   | N, Vert | S, Vert | E, Horiz | W, Horiz -> true
@@ -20,13 +13,6 @@ let is_parallel dir ax =
 
 (* used for reflectors *)
 type diag = NW_SE | NE_SW
-
-let compare_diag d1 d2 =
-  match (d1, d2) with
-  | NW_SE, NW_SE -> 0
-  | NE_SW, NE_SW -> 0
-  | NW_SE, NE_SW -> -1
-  | NE_SW, NW_SE -> 1
 
 let refl_dir corner heading =
   (* reflects the direction specified by heading according to
@@ -43,17 +29,6 @@ let refl_dir corner heading =
 
 type mirror = NoMir | Splitter of axis | Reflector of diag
 
-let compare_mirror m1 m2 =
-  (* helper compare function for use with sets, maps (i.e., the Graph module) *)
-  match (m1, m2) with
-  | NoMir, NoMir -> 0
-  | NoMir, _ -> -1
-  | _, NoMir -> 1
-  | Splitter ax1, Splitter ax2 -> compare_axis ax1 ax2
-  | Reflector d1, Reflector d2 -> compare_diag d1 d2
-  | Splitter _, Reflector _ -> -1
-  | _ -> 1
-
 (* used to indicate whether a node represents light _entering_ the
    mirror or _exiting_ the mirror. Need to prevent reflections in
    pathfinding *)
@@ -63,16 +38,13 @@ let compare_flowdir a b =
   match (a, b) with In, Out -> -1 | Out, In -> 1 | _ -> 0
 
 (* node type for a graph representing the grid *)
-type node = coord * mirror * direction * flowdir
+type node = coord * direction * flowdir
 
-let compare_node (c1, m1, d1, f1) (c2, m2, d2, f2) =
+let compare_node (c1, d1, f1) (c2, d2, f2) =
   (* we have a quite a few of these, huh *)
   match compare_coord c1 c2 with
   | 0 -> (
-      match compare_mirror m1 m2 with
-      | 0 -> (
           match compare_dir d1 d2 with 0 -> compare_flowdir f1 f2 | x -> x)
-      | x -> x)
   | x -> x
 
 let mir_of_coord grid c =
@@ -94,7 +66,7 @@ let ray_penetrates mir heading =
   | Splitter ax -> is_parallel heading ax
 
 (* dummy node representing the light having left the grid *)
-let sink_node = ((Int.min_int, Int.min_int), NoMir, N, In)
+let sink_node = ((Int.min_int, Int.min_int), N, In)
 
 let parse_mir_and_edges grid c =
   (* generates a sequence of graph edges (n1, n2, cost) for a given mirror
@@ -108,28 +80,28 @@ let parse_mir_and_edges grid c =
     | _ -> [ E; W ]
   in
   (* changing orientation at a mirror is represented in the graph as a transition
-     of cost 0 from (c, mir, dir1, In) to (c, mir, dir2, Out) *)
+     of cost 0 from (c, dir1, In) to (c, dir2, Out) *)
   let self_edges =
     match mir with
     | NoMir -> failwith "should never get here"
     | Reflector diag ->
         out_dirs |> List.to_seq
         |> Seq.map (fun d ->
-               ((c, mir, d, In), (c, mir, refl_dir diag d, Out), 0))
+               ((c, d, In), (c, refl_dir diag d, Out), 0))
     | Splitter Horiz ->
         [
-          ((c, mir, N, In), (c, mir, W, Out), 0);
-          ((c, mir, N, In), (c, mir, E, Out), 0);
-          ((c, mir, S, In), (c, mir, W, Out), 0);
-          ((c, mir, S, In), (c, mir, E, Out), 0);
+          ((c, N, In), (c, W, Out), 0);
+          ((c, N, In), (c, E, Out), 0);
+          ((c, S, In), (c, W, Out), 0);
+          ((c, S, In), (c, E, Out), 0);
         ]
         |> List.to_seq
     | Splitter Vert ->
         [
-          ((c, mir, E, In), (c, mir, N, Out), 0);
-          ((c, mir, E, In), (c, mir, S, Out), 0);
-          ((c, mir, W, In), (c, mir, N, Out), 0);
-          ((c, mir, W, In), (c, mir, S, Out), 0);
+          ((c, E, In), (c, N, Out), 0);
+          ((c, E, In), (c, S, Out), 0);
+          ((c, W, In), (c, N, Out), 0);
+          ((c, W, In), (c, S, Out), 0);
         ]
         |> List.to_seq
   in
@@ -144,13 +116,13 @@ let parse_mir_and_edges grid c =
            |> Option.get ))
   (* create edges out of those neighbor coordinates *)
   |> Seq.map (fun (outdir, c2) ->
-         let n1 = (c, mir, outdir, Out) in
+         let n1 = (c, outdir, Out) in
          let m2 = mir_of_coord grid c2 in
          match m2 with
          (* if the ray goes off the map, don't count the step off the map *)
          | NoMir -> (n1, sink_node, manh_dist c c2 - 1)
          | _ ->
-             let n2 = (c2, m2, outdir, In) in
+             let n2 = (c2, outdir, In) in
              (n1, n2, manh_dist c c2))
   |> Seq.append self_edges
 
@@ -166,7 +138,7 @@ let generate_start_edges grid =
   let h = Array.length grid in
   let w = Array.length grid.(0) in
   let start_edge dir c =
-    let start_node = (c, NoMir, dir, Out) in
+    let start_node = (c, dir, Out) in
     let c2 =
       ray_along dir c |> Seq.drop 1
       |> Seq.find (fun c2 ->
@@ -175,7 +147,7 @@ let generate_start_edges grid =
       |> Option.get
     in
     if not (in_grid grid c2) then (start_node, sink_node, manh_dist c c2 - 1)
-    else (start_node, (c2, mir_of_coord grid c2, dir, In), manh_dist c c2)
+    else (start_node, (c2, dir, In), manh_dist c c2)
   in
   let left = ray_along S (0, -1) |> Seq.take h |> Seq.map (start_edge E) in
   let right = ray_along S (0, w) |> Seq.take h |> Seq.map (start_edge W) in
@@ -212,12 +184,12 @@ let traverse_graph g start =
 let coords_covered g start =
   traverse_graph g start
   |> List.fold_left
-       (fun set ((c1, _, d1, _), _, cost) ->
+       (fun set ((c1, d1, _), _, cost) ->
          steps_along d1 cost c1 |> CoordS.of_seq |> CoordS.union set)
        CoordS.empty
 
 let part_1 inp =
-  let start_node : node = ((0, -1), NoMir, E, Out) in
+  let start_node : node = ((0, -1), E, Out) in
   let graph = process_input inp |> generate_graph in
   coords_covered graph start_node |> CoordS.cardinal
 
