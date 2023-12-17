@@ -26,6 +26,7 @@ module type S = sig
   val neighbors : nt -> t -> nt Seq.t
   val neighbor_costs : t -> nt -> (nt * int) Seq.t
   val to_node_seq : t -> nt Seq.t
+  val num_nodes : t -> int
 end
 
 module Make (NT : NodeType) = struct
@@ -113,4 +114,5 @@ module Make (NT : NodeType) = struct
     match EM.find_opt n edges with None -> Seq.empty | Some s -> ES.to_seq s
 
   let to_node_seq (nodes, _) = NM.to_seq nodes |> Seq.map fst
+  let num_nodes (nodes, _) = NM.cardinal nodes
 end
