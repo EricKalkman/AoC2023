@@ -44,7 +44,7 @@ let neighbors cutter grid (d, c) =
                Some (((dir, next_coord), edge_cost), (edge_cost, next_coord))
              else None)
            (0, c)
-         (* cutter used to trim the line of nodes generated; i.e., Seq.take 3 for part 1
+         (* cutter used to trim the line of nodes generated; e.g., Seq.take 3 for part 1
             to get at most 3 nodes in this direction at which point to turn *)
          |> cutter)
 
