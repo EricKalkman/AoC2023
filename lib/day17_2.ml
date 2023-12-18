@@ -84,7 +84,7 @@ let part_1 inp =
   let h = Array.length grid in
   let w = Array.length grid.(0) in
   dijkstra grid
-    (neighbors (Seq.drop 3))
+    (neighbors (Seq.take 3))
     (0, 0)
     (fun (_, c) -> compare_coord c (h - 1, w - 1) == 0)
   |> fst
