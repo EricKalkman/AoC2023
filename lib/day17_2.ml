@@ -79,22 +79,16 @@ let dijkstra grid neighfunc start stopcond =
   in
   dijkstra' (CostS.of_list [ (0, (E, start)); (0, (S, start)) ]) NM.empty
 
-let part_1 inp =
+let part cutter inp =
   let grid = process_input inp in
   let h = Array.length grid in
   let w = Array.length grid.(0) in
   dijkstra grid
-    (neighbors (Seq.take 3))
+    (neighbors cutter)
     (0, 0)
     (fun (_, c) -> compare_coord c (h - 1, w - 1) == 0)
   |> fst
 
-let part_2 inp =
-  let grid = process_input inp in
-  let h = Array.length grid in
-  let w = Array.length grid.(0) in
-  dijkstra grid
-    (neighbors (Seq.drop 3 >> Seq.take 7))
-    (0, 0)
-    (fun (_, c) -> compare_coord c (h - 1, w - 1) == 0)
-  |> fst
+let part_1 = part (Seq.take 3)
+
+let part_2 = part (Seq.drop 3 >> Seq.take 7)
