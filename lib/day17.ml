@@ -12,8 +12,8 @@ let process_input lines =
 type node = direction * coord * int
 
 let compare_node (d1, c1, s1) (d2, c2, s2) =
-  match compare_dir d1 d2 with
-  | 0 -> ( match compare_coord c1 c2 with 0 -> compare s1 s2 | x -> x)
+  match compare_coord c1 c2 with
+  | 0 -> ( match compare s1 s2 with 0 -> compare d1 d2 | x -> x)
   | x -> x
 
 type node_and_cost = node * int
