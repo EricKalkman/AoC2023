@@ -117,3 +117,9 @@
  (name day17_2)
  (modules day17_2)
  (libraries aoc2023))
+
+(executable
+ (public_name day18)
+ (name day18)
+ (modules day18)
+ (libraries aoc2023))

@@ -79,6 +79,22 @@ let int_of_dir d = match d with N -> 0 | E -> 1 | S -> 2 | W -> 3
 let compare_dir d1 d2 = compare (int_of_dir d1) (int_of_dir d2)
 let min_coord a b = if compare a b <= 0 then a else b
 
+type rotdir = Rot0 | Rot90 | Rot180 | Rot270
+
+let rotate_dir rot dir =
+  match rot with
+  | Rot0 -> [| N; E; S; W |].(int_of_dir dir)
+  | Rot90 -> [| E; S; W; N |].(int_of_dir dir)
+  | Rot180 -> [| S; W; N; E |].(int_of_dir dir)
+  | Rot270 -> [| W; N; E; S |].(int_of_dir dir)
+
+let curvature dir1 dir2 =
+  match dir1 with
+  | N -> [| Rot0; Rot90; Rot180; Rot270 |].(int_of_dir dir2)
+  | E -> [| Rot270; Rot0; Rot90; Rot180 |].(int_of_dir dir2)
+  | S -> [| Rot180; Rot270; Rot0; Rot90 |].(int_of_dir dir2)
+  | W -> [| Rot90; Rot180; Rot270; Rot0 |].(int_of_dir dir2)
+
 let coord_neigh4 (row, col) =
   [| (row, col + 1); (row, col - 1); (row + 1, col); (row - 1, col) |]
   |> Array.to_seq

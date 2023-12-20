@@ -141,6 +141,7 @@ let expect_set str =
          match e with FailedPred c -> WrongCharSet (str, c) | e -> e)
 
 let expect_digit = expect_set "0123456789"
+let expect_hexdigit = expect_set "0123456789ABCDEFabcdef"
 let expect_lower = expect_set "abcdefghijklmnopqrstuvwxyz"
 let expect_upper = expect_set "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
