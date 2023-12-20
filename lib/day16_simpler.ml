@@ -1,8 +1,5 @@
 open Common
 
-let test_inp = read_input_file "day16.test"
-let real_inp = read_input_file "day16.inp"
-
 let process_input =
   List.to_seq >> Seq.map (String.to_seq >> Array.of_seq) >> Array.of_seq
 
