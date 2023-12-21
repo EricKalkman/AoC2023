@@ -16,6 +16,8 @@ let read_input_file fname =
 
 let read_intact_input_file fname = read_input_file fname |> String.concat "\n"
 let char_to_str c = String.make 1 c
+let sum = Seq.fold_left ( + ) 0
+let sum_list = List.fold_left ( + ) 0
 
 (*let rec any p lst =
     match lst with
@@ -62,6 +64,14 @@ module CustomMap (M : Map.S) = struct
         | Some x -> Some (fn x))
       mp
 end
+
+let update_unsafe mupdate key fn mp =
+  mupdate key
+    (fun x_opt ->
+      match x_opt with
+      | None -> failwith "update_unsafe"
+      | Some x -> Some (fn x))
+    mp
 
 let rec groups_of_n n sq =
   if Seq.is_empty sq then Seq.empty
