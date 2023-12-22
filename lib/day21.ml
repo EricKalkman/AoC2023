@@ -87,12 +87,16 @@ let part_2 inp =
   (* Some tiled maps are not fully covered; the points not covered have a
      distance > half_width *)
   let num_points_edge_corner =
-    List.(points_of_edge_parity |> filter (fun (_, d) -> d > half_width) |> length)
+    List.(
+      points_of_edge_parity |> filter (fun (_, d) -> d > half_width) |> length)
   in
   (* some tiles are partially covered; these have opposite parity but are otherwise
      symmetrical to num_points_edge_corner *)
   let num_points_non_edge_corner =
-    List.(points_of_non_edge_parity |> filter (fun (_, d) -> d > half_width) |> length)
+    List.(
+      points_of_non_edge_parity
+      |> filter (fun (_, d) -> d > half_width)
+      |> length)
   in
   (* number of fully filled tiles with edge parity *)
   let num_edge_parity = (repeat_radius + 1) * (repeat_radius + 1) in
@@ -101,7 +105,7 @@ let part_2 inp =
   let num_edge_corners = repeat_radius + 1 in
   (* number of corners without edge parity, i.e., those that we need to add in *)
   let num_non_edge_corners = repeat_radius in
-  num_edge_parity * num_points_edge_parity
-  + num_non_edge_parity * num_points_non_edge_parity
-  - num_edge_corners * num_points_edge_corner
-  + num_non_edge_corners * num_points_non_edge_corner
+  (num_edge_parity * num_points_edge_parity)
+  + (num_non_edge_parity * num_points_non_edge_parity)
+  - (num_edge_corners * num_points_edge_corner)
+  + (num_non_edge_corners * num_points_non_edge_corner)
