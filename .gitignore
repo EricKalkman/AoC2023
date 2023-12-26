@@ -1,3 +1,5 @@
 inputs
 _build
 _opam
+nim/day25/day25
+nim/day25/day25/*.txt
