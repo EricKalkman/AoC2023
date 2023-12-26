@@ -116,15 +116,6 @@ let telescope_graph grid =
        (fun edges (n, cost) -> HCM.add_to_list (hash_coord n) (snk, cost) edges)
        edges
 
-let print_edge_graph edges =
-  edges
-  |> CM.iter (fun (row, col) lst ->
-         Printf.printf "(%d, %d): " row col;
-         lst
-         |> List.iter (fun ((r2, c2), cost) ->
-                Printf.printf "(%d, %d | %d); " r2 c2 cost);
-         print_newline ())
-
 let part_2 inp =
   let grid = process_input inp in
   let h = Array.length grid in
