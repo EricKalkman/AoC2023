@@ -109,6 +109,9 @@ let coord_neigh4 (row, col) =
   [| (row, col + 1); (row, col - 1); (row + 1, col); (row - 1, col) |]
   |> Array.to_seq
 
+let coord_neigh4_list (row, col) =
+  [ (row, col + 1); (row, col - 1); (row + 1, col); (row - 1, col) ]
+
 let coord_in_box rowlo rowhi collo colhi (row, col) =
   in_range row rowlo rowhi && in_range col collo colhi
 
@@ -118,6 +121,7 @@ let in_grid grid =
   coord_in_box 0 (h - 1) 0 (w - 1)
 
 let grid_neigh4 grid = coord_neigh4 >> Seq.filter (in_grid grid)
+let grid_neigh4_list grid = coord_neigh4_list >> List.filter (in_grid grid)
 
 let translate dir n (row, col) =
   match dir with
