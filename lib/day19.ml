@@ -28,10 +28,13 @@ let input_parser = workflows_parser >=> skip_nl >=> skip_nl >=> bindings_parser
 type node = string
 type decision = Accept | Reject
 type op = LT | GT
+
 (* result can be an accept/reject decision or another workflow (node) *)
 type result = Node of node | Decision of decision
+
 (* conditional phrase: reg `op` cnst -> res; reg = "register", i.e., x, m, a, or s *)
 type cond = { op : op; reg : node; cnst : int; res : result }
+
 (* a workflow has a final "else" branch as well as a series of conditional phrases *)
 type workflow = { final : result; conds : cond list }
 
@@ -128,9 +131,7 @@ let part_1 inp =
   |> List.fold_left (fun acc bind -> acc + bind.x + bind.m + bind.a + bind.s) 0
 
 let func_of_cond cond x =
-  match cond.op with
-  | LT -> x < cond.cnst
-  | GT -> x > cond.cnst
+  match cond.op with LT -> x < cond.cnst | GT -> x > cond.cnst
 
 let count_paths wfs =
   (* decidedly less concise than part 1 *)
@@ -167,8 +168,8 @@ let count_paths wfs =
                  let condfunc = func_of_cond cond in
                  let cur_filterfuncs =
                    update_unsafe M.update cond.reg
-                   (* all preceding conditionals must succeed, as must the current one *)
-                     (fun filterfunc x -> filterfunc x && condfunc x)
+                     (* all preceding conditionals must succeed, as must the current one *)
+                       (fun filterfunc x -> filterfunc x && condfunc x)
                      filters
                  in
                  let cur_counts = count_paths' cur_filterfuncs cond.res in
