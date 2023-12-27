@@ -193,14 +193,11 @@ let expect_int =
          | e -> e)
   >=> mod_top (fun g -> Int (g |> stringify_group |> int_of_string))
 
-
 let expect_nonempty_list data_p delim_p =
   data_p >=> (skip delim_p >=> data_p |> some)
 
 (* does not automatically group items! *)
-let expect_list data_p delim_p =
-  expect_nonempty_list data_p delim_p |> maybe
-
+let expect_list data_p delim_p = expect_nonempty_list data_p delim_p |> maybe
 let expect_nl = expect_char '\n'
 let skip_nl = skip expect_nl
 let expect_whitespace = expect_set "\n\r\t " |> at_least_one
