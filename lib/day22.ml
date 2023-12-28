@@ -119,8 +119,7 @@ let num_supporting resting_on supporting b =
         let resting_on =
           PQ.fold
             (fun above resting_on ->
-              resting_on
-              |> update_unsafe PM.update above (PQ.remove b1))
+              resting_on |> update_unsafe PM.update above (PQ.remove b1))
             supported resting_on
         in
         let unsupported =
