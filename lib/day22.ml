@@ -100,7 +100,7 @@ let gen_graph bricks =
 
 let part_1 inp =
   let bricks = process_input inp |> stack in
-  let resting_on, supporting = process_input inp |> stack |> gen_graph in
+  let resting_on, supporting = bricks |> gen_graph in
   bricks |> PQ.to_seq
   |> Seq.filter (fun b ->
          match PM.find_opt b supporting with
@@ -134,7 +134,7 @@ let num_supporting resting_on supporting b =
 
 let part_2 inp =
   let bricks = process_input inp |> stack in
-  let resting_on, supporting = process_input inp |> stack |> gen_graph in
+  let resting_on, supporting = bricks |> gen_graph in
   bricks |> PQ.to_seq
   |> Seq.filter (fun b -> compare_brick b ground != 0)
   |> Seq.map (num_supporting resting_on supporting)
