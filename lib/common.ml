@@ -42,15 +42,7 @@ let rec all p sq =
 
 let compose f g x = f (g x)
 let in_range x a b = x >= a && x <= b
-
-let make_range_of_step start stop step =
-  let rec aux acc stop' =
-    if compare start stop' == -compare start stop then acc
-    else aux (Seq.cons stop' acc) (stop' - step)
-  in
-  aux Seq.empty stop
-
-let make_range lo hi = make_range_of_step lo hi 1
+let make_range lo hi = Seq.ints lo |> Seq.take (hi - lo + 1)
 let id x = x
 
 module CustomMap (M : Map.S) = struct
@@ -84,6 +76,12 @@ let neg dir = match dir with N -> S | S -> N | E -> W | W -> E
 
 let compare_coord (x1, y1) (x2, y2) =
   match compare x1 x2 with 0 -> compare y1 y2 | r -> r
+
+module CoordS = Set.Make (struct
+  type t = coord
+
+  let compare = compare_coord
+end)
 
 let int_of_dir d = match d with N -> 0 | E -> 1 | S -> 2 | W -> 3
 let compare_dir d1 d2 = compare (int_of_dir d1) (int_of_dir d2)
