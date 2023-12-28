@@ -132,7 +132,7 @@ let num_supporting resting_on supporting b =
           |> PQ.filter (fun b2 -> resting_on |> PM.find b2 |> PQ.is_empty)
         in
         PQ.cardinal unsupported
-        + num_supporting' (PM.remove b resting_on)
+        + num_supporting' resting_on
             (List.append bs (PQ.to_list unsupported))
   in
   num_supporting' resting_on [ b ]
