@@ -85,15 +85,15 @@ let stack bricks =
   let sorted = bricks |> List.sort (fun b1 b2 -> compare b1.lo.z b2.lo.z) in
   sorted |> List.fold_left stack' (PQ.singleton ground)
 
-let get_touching tanjcon bricks =
-  bricks |> PQ.to_seq
-  |> Seq.map (fun b1 ->
-         ( b1,
-           bricks
-           |> PQ.filter (fun b2 -> tanjcon b1 b2 && bricks_intersect b1 b2) ))
-  |> PM.of_seq
-
 let gen_graph bricks =
+  let get_touching tanjcon bricks =
+    bricks |> PQ.to_seq
+    |> Seq.map (fun b1 ->
+           ( b1,
+             bricks
+             |> PQ.filter (fun b2 -> tanjcon b1 b2 && bricks_intersect b1 b2) ))
+    |> PM.of_seq
+  in
   let resting_on = get_touching (fun b1 b2 -> b1.lo.z == b2.hi.z) bricks in
   let supporting = get_touching (fun b1 b2 -> b1.hi.z == b2.lo.z) bricks in
   (resting_on, supporting)
