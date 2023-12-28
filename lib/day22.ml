@@ -1,8 +1,6 @@
 open Parsing
 open Common
 
-let test_inp = read_input_file "day22.test"
-let real_inp = read_input_file "day22.inp"
 let brick_parser = expect_list expect_int (expect_char ',')
 let line_parser = brick_parser >=> skip_char '~' >=> brick_parser
 
@@ -30,7 +28,6 @@ let process_line inp =
   | _ -> failwith "invalid line format"
 
 let process_input = List.map process_line
-let bricks = process_input test_inp
 
 let compare_brick b1 b2 =
   match compare_coord3 b1.lo b2.lo with
