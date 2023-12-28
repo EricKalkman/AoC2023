@@ -90,7 +90,6 @@ let get_touching tanjcon bricks =
   |> Seq.map (fun b1 ->
          ( b1,
            bricks
-           (*|> List.filter (fun b2 -> b.lo.z == b2.hi.z && bricks_intersect b b2)*)
            |> PQ.filter (fun b2 -> tanjcon b1 b2 && bricks_intersect b1 b2) ))
   |> PM.of_seq
 
