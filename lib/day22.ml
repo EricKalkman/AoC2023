@@ -60,6 +60,12 @@ module PQ = Set.Make (struct
   let compare = compare_brick_top_face
 end)
 
+module PM = Map.Make (struct
+  type t = brick
+
+  let compare = compare_brick
+end)
+
 let stack bricks =
   let stack' stacked b =
     let top_brick =
@@ -78,12 +84,6 @@ let stack bricks =
   in
   let sorted = bricks |> List.sort (fun b1 b2 -> compare b1.lo.z b2.lo.z) in
   sorted |> List.fold_left stack' (PQ.singleton ground)
-
-module PM = Map.Make (struct
-  type t = brick
-
-  let compare = compare_brick
-end)
 
 let get_touching tanjcon bricks =
   bricks |> PQ.to_seq
@@ -129,8 +129,7 @@ let num_supporting resting_on supporting b =
           |> PQ.filter (fun b2 -> resting_on |> PM.find b2 |> PQ.is_empty)
         in
         PQ.cardinal unsupported
-        + num_supporting' resting_on
-            (List.append bs (PQ.to_list unsupported))
+        + num_supporting' resting_on (List.append bs (PQ.to_list unsupported))
   in
   num_supporting' resting_on [ b ]
 
