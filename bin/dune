@@ -155,6 +155,12 @@
  (libraries aoc2023))
 
 (executable
+ (public_name day24)
+ (name day24)
+ (modules day24)
+ (libraries aoc2023))
+
+(executable
  (public_name day25)
  (name day25)
  (modules day25)
