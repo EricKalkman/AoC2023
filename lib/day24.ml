@@ -87,9 +87,7 @@ let get_v n p0 hs =
   let dx = subv int2_p int1_p in
   let dt = int2_t -/ int1_t in
   let v = scale_inv dt dx in
-  let throw_start =
-    eval_traj { pos = int1_p; vel = v } (Int (-1) */ int1_t)
-  in
+  let throw_start = eval_traj { pos = int1_p; vel = v } (Int (-1) */ int1_t) in
   (throw_start, v)
 
 let get_throw hs =
