@@ -182,9 +182,7 @@ let part_1 inp =
   let start_node : node = ((0, -1), E) in
   let grid = process_input inp in
   let graph = grid |> generate_graph in
-  let h = Array.length grid in
-  let w = Array.length grid.(0) in
-  coords_covered (traverse_graph_arr h w) graph start_node |> CoordS.cardinal
+  coords_covered traverse_graph graph start_node |> CoordS.cardinal
 
 let part_2 inp =
   let grid = process_input inp in
