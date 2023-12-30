@@ -1,8 +1,5 @@
 open Common
 
-let test_inp = read_input_file "day01.test"
-let real_inp = read_input_file "day01.inp"
-
 let digits_of_string str =
   str
   |> String.fold_left
