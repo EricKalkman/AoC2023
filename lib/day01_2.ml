@@ -14,7 +14,7 @@ let digits_of_string str =
 let part_1 inp =
   inp |> List.to_seq |> Seq.map digits_of_string
   |> Seq.map (fun (a, b) ->
-         Option.(String.make 1 (get a) ^ String.make 1 (get b) |> int_of_string))
+         Option.((get a |> Char.escaped) ^ (get b |> Char.escaped) |> int_of_string))
   |> sum
 
 let find_in_string str sub =
