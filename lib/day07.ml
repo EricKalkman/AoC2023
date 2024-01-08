@@ -1,3 +1,4 @@
+open Common
 open Parsing
 
 let card_to_int c =
@@ -25,49 +26,21 @@ type hand_score =
   | FullHouse
   | FourOfKind
   | Yahtzee
-
-(* used for sorting results *)
-let int_of_hand_score h =
-  match h with
-  | HighCard -> 0
-  | OnePair -> 1
-  | TwoPair -> 2
-  | ThreeOfKind -> 3
-  | FullHouse -> 4
-  | FourOfKind -> 5
-  | Yahtzee -> 6
-
-let compare_hand_score a b = compare (int_of_hand_score a) (int_of_hand_score b)
+[@@deriving ord]
 
 let sort_hand_counts counts =
   (* takes the map of card -> counts and sorts the values of the map (descending) *)
-  CM.to_seq counts |> Seq.map snd |> List.of_seq
-  |> List.sort (fun n1 n2 -> compare n2 n1)
-  |> List.to_seq
-
-let n_of_a_kind n sorted_nums =
-  (* checks if there exists a card that has a count of exactly n *)
-  (* sorted_nums is a list of numbers of the different kinds of cards, sorted
-      in a descending order *)
-  match sorted_nums |> Seq.drop_while (fun cnt -> cnt > n) |> Seq.uncons with
-  | None -> false
-  | Some (cnt, _) -> cnt == n
-
-let tupper sorted_nums =
-  (* checks for two pairs *)
-  match Seq.take 2 sorted_nums |> List.of_seq with
-  | n1 :: n2 :: _ -> n1 == 2 && n2 == 2
-  | _ -> false
+  CM.to_list counts |> List.map snd |> List.sort (fun n1 n2 -> compare n2 n1)
 
 let score_hand h =
-  let sorted = sort_hand_counts h.counts in
-  if n_of_a_kind 5 sorted then Yahtzee
-  else if n_of_a_kind 4 sorted then FourOfKind
-  else if n_of_a_kind 3 sorted && n_of_a_kind 2 sorted then FullHouse
-  else if n_of_a_kind 3 sorted then ThreeOfKind
-  else if tupper sorted then TwoPair
-  else if n_of_a_kind 2 sorted then OnePair
-  else HighCard
+  match sort_hand_counts h.counts with
+  | [ 5 ] -> Yahtzee
+  | 4 :: _ -> FourOfKind
+  | 3 :: 2 :: _ -> FullHouse
+  | 3 :: _ -> ThreeOfKind
+  | 2 :: 2 :: _ -> TwoPair
+  | 2 :: _ -> OnePair
+  | _ -> HighCard
 
 let compare_hands cmpcard promoter h1 h2 =
   (* cmpcard and promoter complications resulting from Part 2 *)
@@ -99,8 +72,8 @@ let input_parser =
 
 let process_input inp =
   let count_cards str =
-    String.to_seq str
-    |> Seq.fold_left
+    str
+    |> String.fold_left
          (fun m c ->
            CM.update c
              (fun v -> match v with Some x -> Some (x + 1) | _ -> Some 1)
@@ -129,7 +102,7 @@ let part cti promote hands =
   |> List.to_seq
   (* multiply each hand's rank by its bid *)
   |> Seq.mapi (fun rank h -> (rank + 1) * h.bid)
-  |> Seq.fold_left ( + ) 0
+  |> sum
 
 let part_1 inp = process_input inp |> part card_to_int (fun _ x -> x)
 
@@ -138,7 +111,7 @@ let card_to_int2 c = match c with 'J' -> 1 | x -> card_to_int x
 
 let rec promote_n_jokers score n =
   (* For any hand with Jokers, there are two facts on how to use them as wildcards:
-     1. It is always best to promote the Joker is as another copy of the non-Joker card
+     1. It is always best to promote the Joker as another copy of the non-Joker card
         with the greatest count.
      2. The greatest count of all non-Joker cards is unambiguous represented by the score
         of the truncated hand not containing the Joker.
