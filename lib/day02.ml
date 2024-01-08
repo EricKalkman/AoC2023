@@ -45,7 +45,7 @@ let is_game_possible n_balls g =
     (List.to_seq g.rounds)
 
 let part_1_maxes =
-  [ ("red", 12); ("green", 13); ("blue", 14) ] |> List.to_seq |> ColorMap.of_seq
+  [ ("red", 12); ("green", 13); ("blue", 14) ] |> ColorMap.of_list
 
 let part_1 lines =
   parse_input lines |> List.to_seq
@@ -62,11 +62,12 @@ let min_cubes game =
            | Some c -> Some (Int.max c bc.count))
   in
   let start_counts =
-    [ ("red", 0); ("green", 0); ("blue", 0) ] |> List.to_seq |> ColorMap.of_seq
+    [ ("red", 0); ("green", 0); ("blue", 0) ] |> ColorMap.of_list
   in
-  List.fold_left
-    (fun counts round -> List.fold_left fold_pull counts round)
-    start_counts game.rounds
+  game.rounds
+  |> List.fold_left
+       (fun counts round -> List.fold_left fold_pull counts round)
+       start_counts
 
 let game_power game =
   min_cubes game |> ColorMap.to_seq |> Seq.map snd |> Seq.fold_left ( * ) 1
