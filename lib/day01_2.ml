@@ -14,7 +14,8 @@ let digits_of_string str =
 let part_1 inp =
   inp |> List.to_seq |> Seq.map digits_of_string
   |> Seq.map (fun (a, b) ->
-         Option.((get a |> Char.escaped) ^ (get b |> Char.escaped) |> int_of_string))
+         Option.(
+           (get a |> Char.escaped) ^ (get b |> Char.escaped) |> int_of_string))
   |> sum
 
 let find_in_string str sub =
@@ -71,8 +72,12 @@ let part_2 inp =
     let right_strdig, right_strdig_pos =
       find digit_names (rfind_in_string str) ( > ) Int.min_int
     in
-    let left = if left_strdig_pos < left_dig_pos then left_strdig else left_dig in
-    let right = if right_strdig_pos > right_dig_pos then right_strdig else right_dig in
-    left * 10 + right
+    let left =
+      if left_strdig_pos < left_dig_pos then left_strdig else left_dig
+    in
+    let right =
+      if right_strdig_pos > right_dig_pos then right_strdig else right_dig
+    in
+    (left * 10) + right
   in
   inp |> List.to_seq |> Seq.map all_kinds_of_digits |> sum
